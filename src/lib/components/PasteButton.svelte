@@ -2,7 +2,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { isProcessing, toastMessage } from '../stores/appState.js';
-    import { readClipboard, extractFilePathFromComment, cleanPath } from '../utils/clipboardHandler.js';
+    import { readClipboard } from '../utils/clipboardHandler.js';
     import { pasteFileContent, getReadableSize } from '../utils/fileManager.js';
 
     export let filePath; // The path of the file this button belongs to
@@ -21,29 +21,11 @@
             // Read clipboard content
             const clipboardText = await readClipboard();
             
-            // Extract path from first line comment
-            const extractedPath = extractFilePathFromComment(clipboardText);
-            
-            if (!extractedPath) {
-                throw new Error('First line mein valid file path comment nahi mila');
+            if (!clipboardText || clipboardText.trim() === '') {
+                throw new Error('Clipboard khali hai');
             }
 
-            const cleanedPath = cleanPath(extractedPath);
-            
-            // Verify that the extracted path matches this button's file path
-            // This is a safety check to prevent pasting to wrong file
-            if (cleanedPath !== filePath) {
-                // Try to see if it's just a prefix difference (e.g., src/lib/Button vs lib/Button)
-                const filePathParts = filePath.split('/');
-                const cleanedParts = cleanedPath.split('/');
-                const lastPartMatch = filePathParts[filePathParts.length - 1] === cleanedParts[cleanedParts.length - 1];
-                
-                if (!lastPartMatch) {
-                    throw new Error(`Path mismatch: Clipboard file "${cleanedPath}" doesn't match this file "${filePath}"`);
-                }
-            }
-
-            // Calculate size and paste
+            // Calculate size and paste directly
             const size = getReadableSize(clipboardText);
             pasteFileContent(filePath, clipboardText);
             
