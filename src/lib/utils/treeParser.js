@@ -2,7 +2,8 @@
 
 /**
  * Parses an ASCII folder structure into a nested JSON tree.
- * Uses lookahead logic for accurate folder detection and safely strips common roots from paths.
+ * Uses lookahead logic for accurate folder detection, safely strips common roots,
+ * and correctly ignores empty vertical pipe lines.
  * @param {string} rawText - The pasted folder structure text.
  * @returns {Array} - Array of root nodes (each with name, type, path, children if folder).
  */
@@ -21,6 +22,10 @@ export function parseFolderStructure(rawText) {
         if (!match) continue;
 
         let name = match[2].trim();
+        
+        // BUG FIX: Ignore lines that only contain tree drawing characters (like vertical pipes)
+        if (name === '') continue;
+
         const isFolderHint = name.endsWith('/');
         if (isFolderHint) name = name.slice(0, -1);
 
