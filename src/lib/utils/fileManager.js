@@ -1,6 +1,6 @@
 // src/lib/utils/fileManager.js
 import { get } from 'svelte/store';
-import { fileMap } from '../stores/appState.js';
+import { fileMap } from '$stores/appState.js';
 
 /**
  * Calculate human-readable file size from content string.

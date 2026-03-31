@@ -1,14 +1,24 @@
 // src/lib/stores/appState.js
 import { writable } from 'svelte/store';
+import { createPersistentStore } from './persistentStore.js';
+import { loadProjectTree, saveProjectTree, loadFileMap, saveFileMap } from '$utils/indexedDB.js';
 
-// Project tree structure (from pasted folder structure)
-export const projectTree = writable([]);
+// Persistent store for project tree (folder/file structure)
+export const projectTree = createPersistentStore({
+  load: loadProjectTree,
+  save: saveProjectTree,
+  initialValue: []
+});
 
-// File data store
-// Key: file path (string)
-// Value: { content: string, size: string, status: 'pending' | 'pasted' | 'deleted' }
-export const fileMap = writable({});
+// Persistent store for file content map
+export const fileMap = createPersistentStore({
+  load: loadFileMap,
+  save: saveFileMap,
+  initialValue: {}
+});
 
-// UI states
+// Non-persisted UI state: async operation flag
 export const isProcessing = writable(false);
+
+// Non-persisted UI state: toast notifications
 export const toastMessage = writable({ show: false, message: '', type: 'success' });
